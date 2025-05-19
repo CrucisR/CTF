@@ -1,0 +1,197 @@
+package f1;
+
+/* loaded from: classes.dex */
+public abstract class a {
+
+    /* renamed from: a */
+    public static final char[] f3808a = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
+
+    public static int a(int i2, int i3, int i4, int i5, int i6, int[] iArr) {
+        return ((i2 ^ i3) + (iArr[(i5 & 3) ^ i6] ^ i4)) ^ (((i4 >>> 5) ^ (i3 << 2)) + ((i3 >>> 3) ^ (i4 << 4)));
+    }
+
+    public static final byte[] b(byte[] bArr, byte[] bArr2) {
+        if (bArr.length == 0) {
+            return bArr;
+        }
+        int[] c3 = c(bArr, true);
+        if (bArr2.length != 16) {
+            byte[] bArr3 = new byte[16];
+            if (bArr2.length < 16) {
+                System.arraycopy(bArr2, 0, bArr3, 0, bArr2.length);
+            } else {
+                System.arraycopy(bArr2, 0, bArr3, 0, 16);
+            }
+            bArr2 = bArr3;
+        }
+        int[] c4 = c(bArr2, false);
+        int length = c3.length;
+        int i2 = length - 1;
+        if (i2 >= 1) {
+            int i3 = (52 / length) + 6;
+            int i4 = c3[i2];
+            int i5 = 0;
+            while (true) {
+                int i6 = i3 - 1;
+                if (i3 <= 0) {
+                    break;
+                }
+                int i7 = (-1640531527) + i5;
+                int i8 = (i7 >>> 2) & 3;
+                int i9 = i4;
+                int i10 = 0;
+                while (i10 < i2) {
+                    int i11 = i10 + 1;
+                    i9 = c3[i10] + a(i7, c3[i11], i9, i10, i8, c4);
+                    c3[i10] = i9;
+                    i10 = i11;
+                }
+                i5 = i7;
+                i4 = a(i5, c3[0], i9, i10, i8, c4) + c3[i2];
+                c3[i2] = i4;
+                i3 = i6;
+            }
+        }
+        int length2 = c3.length << 2;
+        byte[] bArr4 = new byte[length2];
+        for (int i12 = 0; i12 < length2; i12++) {
+            bArr4[i12] = (byte) (c3[i12 >>> 2] >>> ((i12 & 3) << 3));
+        }
+        return bArr4;
+    }
+
+    public static int[] c(byte[] bArr, boolean z3) {
+        int length;
+        int[] iArr;
+        if ((bArr.length & 3) == 0) {
+            length = bArr.length >>> 2;
+        } else {
+            length = (bArr.length >>> 2) + 1;
+        }
+        if (z3) {
+            iArr = new int[length + 1];
+            iArr[length] = bArr.length;
+        } else {
+            iArr = new int[length];
+        }
+        int length2 = bArr.length;
+        for (int i2 = 0; i2 < length2; i2++) {
+            int i3 = i2 >>> 2;
+            iArr[i3] = iArr[i3] | ((bArr[i2] & 255) << ((i2 & 3) << 3));
+        }
+        return iArr;
+    }
+}
+
+package com.easy1;
+
+import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import g1.a;
+
+/* loaded from: classes.dex */
+public class MainActivity extends AppCompatActivity {
+    private a binding;
+    private EditText et;
+
+    public void oO0(View view) {
+        byte[] bArr;
+        char[] cArr;
+        String obj = this.et.getText().toString();
+        try {
+            bArr = f1.a.b(obj.getBytes("UTF-8"), "flag{123456}".getBytes("UTF-8"));
+        } catch (Exception unused) {
+            bArr = null;
+        }
+        StringBuilder sb = new StringBuilder();
+        int length = bArr.length % 3;
+        int length2 = bArr.length - length;
+        int i2 = 0;
+        while (true) {
+            cArr = f1.a.f3808a;
+            if (i2 >= length2) {
+                break;
+            }
+            int i3 = i2 + 2;
+            int i4 = (bArr[i2 + 1] & 255) << 8;
+            i2 += 3;
+            int i5 = i4 | ((bArr[i2] & 255) << 16) | (bArr[i3] & 255);
+            sb.append(cArr[i5 >> 18]);
+            sb.append(cArr[(i5 >> 12) & 63]);
+            sb.append(cArr[(i5 >> 6) & 63]);
+            sb.append(cArr[i5 & 63]);
+        }
+        if (length == 1) {
+            byte b3 = bArr[i2];
+            sb.append(cArr[(b3 & 255) >> 2]);
+            sb.append(cArr[(b3 & 3) << 4]);
+            sb.append("==");
+        } else if (length == 2) {
+            int i6 = (bArr[i2 + 1] & 255) | ((bArr[i2] & 255) << 8);
+            sb.append(cArr[i6 >> 10]);
+            sb.append(cArr[(i6 >> 4) & 63]);
+            sb.append(cArr[(i6 & 15) << 2]);
+            sb.append("=");
+        }
+        if (sb.toString().equals("u4jdb+9UH2RXBYKYjjKfA4OrmQvuikG89aXT5G+a1dhncN6QxzL6SA==")) {
+            Toast.makeText(this, "flag{" + obj + "}", 1).show();
+            return;
+        }
+        Toast.makeText(this, "Please try again", 1).show();
+    }
+
+    /* JADX WARN: Type inference failed for: r0v5, types: [g1.a, java.lang.Object] */
+    @Override // androidx.fragment.app.FragmentActivity, androidx.activity.ComponentActivity, androidx.core.app.ComponentActivity, android.app.Activity
+    public void onCreate(Bundle bundle) {
+        View findViewById;
+        super.onCreate(bundle);
+        KeyEvent.Callback callback = null;
+        int i2 = 0;
+        View inflate = getLayoutInflater().inflate(R.layout.activity_main, (ViewGroup) null, false);
+        int i3 = R.id.button;
+        boolean z3 = inflate instanceof ViewGroup;
+        if (z3) {
+            ViewGroup viewGroup = (ViewGroup) inflate;
+            int childCount = viewGroup.getChildCount();
+            for (int i4 = 0; i4 < childCount; i4++) {
+                findViewById = viewGroup.getChildAt(i4).findViewById(i3);
+                if (findViewById != null) {
+                    break;
+                }
+            }
+        }
+        findViewById = null;
+        if (((Button) findViewById) != null) {
+            i3 = R.id.sample_text;
+            if (z3) {
+                ViewGroup viewGroup2 = (ViewGroup) inflate;
+                int childCount2 = viewGroup2.getChildCount();
+                while (true) {
+                    if (i2 >= childCount2) {
+                        break;
+                    }
+                    KeyEvent.Callback findViewById2 = viewGroup2.getChildAt(i2).findViewById(i3);
+                    if (findViewById2 != null) {
+                        callback = findViewById2;
+                        break;
+                    }
+                    i2++;
+                }
+            }
+            if (((EditText) callback) != null) {
+                this.binding = new Object();
+                setContentView((ConstraintLayout) inflate);
+                this.et = (EditText) findViewById(R.id.sample_text);
+                return;
+            }
+        }
+        throw new NullPointerException("Missing required view with ID: ".concat(inflate.getResources().getResourceName(i3)));
+    }
+}  用中文对话，请给出完整准确的python代码的解密方案
